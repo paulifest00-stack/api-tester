@@ -1,0 +1,21 @@
+{
+  "name": "api-tester-app",
+  "version": "1.0.0",
+  "description": "App responsivo mobile e desktop para testar chaves de API e extrair créditos/saldo",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "api-tester",
+    "openai",
+    "openrouter",
+    "gemini",
+    "deepseek",
+    "elevenlabs",
+    "balance-checker"
+  ],
+  "author": "",
+  "license": "MIT"
+}

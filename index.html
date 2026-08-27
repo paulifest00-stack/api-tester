@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>API Key Tester & Balance Checker</title>
+  <meta name="description" content="Verificador e testador rápido de chaves de API, status de funcionamento e saldo/créditos restantes para OpenAI, OpenRouter, Gemini, Claude, DeepSeek, ElevenLabs e mais.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient-glow" aria-hidden="true"></div>
+
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-left">
+        <div class="app-logo">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m13 2-2 2.5h3L11 8h3L9 14h3l-5 8 2-6H6l3-5H6l4-5H7l4-4h2z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 class="app-title">API Tester</h1>
+          <span class="app-subtitle">Validador de Chaves & Saldo</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="proxyToggleBtn" class="pill-chip" title="Alternar modo de requisição (Direto ou Proxy CORS)" aria-label="Alternar Proxy">
+          <span class="pulse-dot"></span>
+          <span id="proxyStatusLabel">Proxy: Desativado</span>
+        </button>
+
+        <button id="themeToggleBtn" class="icon-button" title="Alternar Tema Claro/Escuro" aria-label="Alternar Tema">
+          <svg id="sunIcon" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+          <svg id="moonIcon" class="icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="glass-card primary-card">
+        <div class="card-header-row">
+          <label for="apiKeyInput" class="input-label">Chave de API</label>
+          <div id="detectedBadge" class="detected-badge hidden">
+            <span class="sparkle">✨</span>
+            <span id="detectedProviderName">Auto-detectado</span>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <div class="input-wrapper">
+            <input 
+              type="password" 
+              id="apiKeyInput" 
+              class="api-input" 
+              placeholder="Cole sua chave aqui (ex: sk-..., AIzaSy..., gsk_...)" 
+              autocomplete="off" 
+              spellcheck="false"
+              autofocus
+            />
+            <div class="input-inner-actions">
+              <button type="button" id="toggleMaskBtn" class="input-icon-btn" title="Mostrar/Ocultar Chave" aria-label="Mostrar ou ocultar chave">
+                <svg id="eyeIcon" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <svg id="eyeOffIcon" class="icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
+                  <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
+                  <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/>
+                  <line x1="2" x2="22" y1="2" y2="22"/>
+                </svg>
+              </button>
+              <button type="button" id="pasteBtn" class="input-action-pill" title="Colar da Área de Transferência">
+                <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                </svg>
+                <span>Colar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="providers-section">
+          <div class="providers-header">
+            <span class="sub-label">Provedor</span>
+            <span class="sub-hint">Selecione ou deixe auto-detectar</span>
+          </div>
+          <div class="providers-scroll" id="providerSelector">
+            <button class="provider-pill active" data-provider="auto">
+              <span class="provider-icon">⚡</span>
+              <span>Auto-detectar</span>
+            </button>
+            <button class="provider-pill" data-provider="openrouter">
+              <span class="provider-icon">🌐</span>
+              <span>OpenRouter</span>
+              <span class="balance-tag">Saldo</span>
+            </button>
+            <button class="provider-pill" data-provider="deepseek">
+              <span class="provider-icon">🐳</span>
+              <span>DeepSeek</span>
+              <span class="balance-tag">Saldo</span>
+            </button>
+            <button class="provider-pill" data-provider="elevenlabs">
+              <span class="provider-icon">🎙️</span>
+              <span>ElevenLabs</span>
+              <span class="balance-tag">Saldo</span>
+            </button>
+            <button class="provider-pill" data-provider="openai">
+              <span class="provider-icon">🤖</span>
+              <span>OpenAI</span>
+            </button>
+            <button class="provider-pill" data-provider="gemini">
+              <span class="provider-icon">✨</span>
+              <span>Gemini</span>
+            </button>
+            <button class="provider-pill" data-provider="anthropic">
+              <span class="provider-icon">🧠</span>
+              <span>Claude</span>
+            </button>
+            <button class="provider-pill" data-provider="groq">
+              <span class="provider-icon">⚡</span>
+              <span>Groq</span>
+            </button>
+            <button class="provider-pill" data-provider="github">
+              <span class="provider-icon">🐙</span>
+              <span>GitHub</span>
+              <span class="balance-tag">Cota</span>
+            </button>
+            <button class="provider-pill" data-provider="custom">
+              <span class="provider-icon">⚙️</span>
+              <span>Custom REST</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="customConfigSection" class="custom-config-drawer hidden">
+          <div class="custom-grid">
+            <div class="custom-field">
+              <label class="small-label">Método</label>
+              <select id="customMethod" class="apple-select">
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+              </select>
+            </div>
+            <div class="custom-field flex-grow">
+              <label class="small-label">URL do Endpoint</label>
+              <input type="url" id="customUrl" class="apple-input" placeholder="https://api.exemplo.com/v1/user">
+            </div>
+          </div>
+          <div class="custom-field mt-2">
+            <label class="small-label">Header de Autenticação</label>
+            <div class="input-row">
+              <select id="customAuthType" class="apple-select">
+                <option value="bearer">Authorization: Bearer [chave]</option>
+                <option value="apikey">X-API-Key: [chave]</option>
+                <option value="token">Authorization: token [chave]</option>
+                <option value="query">URL Param: ?api_key=[chave]</option>
+                <option value="none">Nenhum / Chave já está na URL</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button type="button" id="testBtn" class="primary-btn">
+            <span class="btn-content">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              <span id="testBtnText">Testar API</span>
+            </span>
+            <div id="btnSpinner" class="btn-spinner hidden"></div>
+          </button>
+        </div>
+      </section>
+
+      <section id="resultsSection" class="results-section hidden">
+        <div class="glass-card result-card" id="resultCard">
+          <div class="result-header">
+            <div class="status-indicator-group">
+              <div id="statusPulseDot" class="status-dot"></div>
+              <div>
+                <div class="status-title-row">
+                  <h2 id="statusTitle" class="status-title">Verificando...</h2>
+                  <span id="statusCodeBadge" class="status-code-badge">HTTP 200</span>
+                </div>
+                <p id="statusDescription" class="status-desc">Avaliando resposta da API...</p>
+              </div>
+            </div>
+
+            <div class="metrics-chips">
+              <div class="metric-chip" title="Tempo de resposta">
+                <span class="metric-icon">⏱️</span>
+                <span id="latencyValue" class="metric-value">-- ms</span>
+              </div>
+              <div class="metric-chip" title="Provedor avaliado">
+                <span class="metric-icon">🏢</span>
+                <span id="providerValue" class="metric-value">--</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="balanceCard" class="balance-card hidden">
+            <div class="balance-top">
+              <div class="balance-label-group">
+                <span class="balance-badge-pill">Saldo & Créditos</span>
+                <h3 id="balanceMainAmount" class="balance-amount">$0.00</h3>
+                <span id="balanceSubtitle" class="balance-sub">Disponível para uso</span>
+              </div>
+              <div class="balance-right-stats" id="balanceExtraDetails"></div>
+            </div>
+
+            <div id="balanceMeterContainer" class="meter-container hidden">
+              <div class="meter-labels">
+                <span id="meterUsedLabel">Uso: 0%</span>
+                <span id="meterRemainingLabel">Restante: 100%</span>
+              </div>
+              <div class="meter-track">
+                <div id="meterFill" class="meter-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="detailsCard" class="details-card hidden">
+            <div class="details-header">
+              <span id="detailsTitle" class="details-title">Recursos Detectados</span>
+              <span id="detailsBadge" class="details-badge">0 itens</span>
+            </div>
+            <div id="detailsList" class="details-chips-wrapper"></div>
+          </div>
+
+          <div class="response-inspector">
+            <div class="inspector-header">
+              <button type="button" id="toggleInspectorBtn" class="inspector-toggle-btn">
+                <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+                <span>Ver Resposta Completa da API (JSON)</span>
+              </button>
+              <button type="button" id="copyJsonBtn" class="mini-icon-btn" title="Copiar JSON">
+                <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                </svg>
+                <span>Copiar</span>
+              </button>
+            </div>
+            <div id="inspectorContent" class="inspector-body hidden">
+              <pre><code id="jsonCodeOutput" class="json-code">{}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="history-section">
+        <div class="section-title-row">
+          <h3 class="section-heading">Testes Recentes</h3>
+          <button type="button" id="clearHistoryBtn" class="text-link-btn hidden">Limpar histórico</button>
+        </div>
+
+        <div id="historyList" class="history-list">
+          <div class="empty-history-state" id="emptyHistoryState">
+            <span class="empty-icon">📝</span>
+            <p>Nenhuma chave testada recentemente.</p>
+            <span class="empty-sub">Seus testes ficam salvos apenas localmente no seu navegador.</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>API Tester • Design fluido e responsivo • Suas chaves nunca saem do seu navegador</p>
+    </footer>
+  </div>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
